@@ -365,14 +365,14 @@ Now, try to answer the following questions.
 **Answers**
 1. 19.1165 km^2
 2. vegetation.3
-3. 
+3. 6 features have a total abundance greater than 100 km^2.
 
 ```{r}
 median(abundance_data$absolute_abundance_km2)
 
 abundance_data$feature[which.min(abundance_data$absolute_abundance_km2)]
 
-sum(abundance_data$absolute_abundance_km2 > set_units(100))
+sum(abundance_data$absolute_abundance_km2 > set_units(100, km^2))
 
 ```
 
@@ -417,6 +417,24 @@ Now let's investigate how well the species are represented.
 4. Is there a relationship between the total abundance of a feature and how well it is represented by protected areas (hint: `plot(abundance_data$absolute_abundance ~ repr_data$relative_held)`)?
 
 ```
+
+**Answers** 
+1. 0.24
+2. 17
+3. 18 
+4. Based on the plot between total abundance and relative_held, a relationship is hard to determine. There are two instances where values of less than 0.4 relative_held corresponds to really high values of total abundance. Overall there does not seem to be a clear relationship at all. 
+
+```{r}
+mean(repr_data$relative_held)
+
+sum(repr_data$relative_held <= .1)
+
+sum(repr_data$relative_held <= .2)
+
+plot(abundance_data$absolute_abundance ~ repr_data$relative_held)
+```
+
+
 
 # Spatial prioritizations
 
@@ -474,6 +492,16 @@ Now let's examine the solution.
 3. Can you verify that all of the targets were met in the prioritization (hint: `eval_feature_representation_summary(p1, s1[, "solution_1"])`)?
 
 ```
+
+**Answers**
+1. 15
+2. There does not seem to be an obvious pattern of the priority areas. There is only one in the south area of the plot, and overall the other priority areas are pretty scattered. 
+3. ?
+
+```{r}
+eval_feature_representation_summary(p1, s1[, "solution_1"])
+```
+
 
 ## Adding complexity
 
@@ -596,6 +624,14 @@ Now, let's compare the solutions.
 
 ```
 
+**Answers**
+1. s2: 6600, s3: 6669.9, s4: 6711.6
+2. s2: , s3: , s4: 
+3.
+4.
+5.
+
+
 ## Penalizing fragmentation
 
 Plans for protected area systems should promote connectivity. However, the prioritizations we have made so far have been highly fragmented. To address this issue, we can add penalties to our conservation planning problem to penalize fragmentation. These penalties work by specifying a trade-off between the primary objective (here, solution cost) and fragmentation  (i.e. total exposed boundary length) using a penalty value. If we set the penalty value too low, then we will end up with a solution that is nearly identical to the previous solution. If we set the penalty value too high, then prioritizr will (1) take a long time to solve the problem and (2) we will end up with a solution that contains lots of extra planning units that are not needed. This is because the minimizing fragmentation is considered so much more important than solution cost that the optimal solution is simply to select as many planning units as possible.
@@ -651,3 +687,8 @@ Now let's compare the solutions to the problems with (`s5`) and without (`s4`) t
 3. Try setting the penalty value to 0.5. What is the cost of the solution now? Is it different from the fourth solution (`s4`) (hint: try plotting the solutions to visualize them)? Is this a useful penalty value? Why (or why not)?
 
 ```
+
+**Answers**
+1. $6711.58 and $8017.98. The 5th solution costs more because it covers more area so as to promote connectivity. 
+2. 
+3. 
