@@ -36,7 +36,7 @@ The [R statistical computing environment](https://www.r-project.org) can be down
 [RStudio](https://www.rstudio.com) is an integrated development environment (IDE). In other words, it is a program that is designed to make your R programming experience more enjoyable. During this workshop, you will interact with R through RStudio---meaning that you will open RStudio to code in R. You can download the latest version of RStudio here: http://www.rstudio.com/download. When you start RStudio, you will see two main parts of the interface:
 
 ```{r, out.width = "100%", echo = FALSE}
-knitr::include_graphics("img/lab3_prioritizr/rstudio-console.png")
+#knitr::include_graphics("img/lab3_prioritizr/rstudio-console.png")
 ```
 
 You can type R code into the _Console_ and press the enter key to run code.
@@ -181,9 +181,12 @@ Now, you can try and answer some questions about the planning unit data.
 ```
 
 **Answers**
+
 1. 516 planning units 
-2. The highest cost values is 47.23834.
-3. It seems that the lower cost values occur in the eastern area of Tasmania, with cost values increasing as you move to the west. The highest cost values appear to occur in the northern area.  
+
+2. The highest cost values is 47.238 millions of Australian dollars.
+
+3. It seems that the lower cost values occur in the eastern area of Tasmania, with cost values increasing as you move to the west. The highest cost values appear to occur in the northern, middle area.  
 
 \clearpage
 
@@ -191,7 +194,6 @@ Now, you can try and answer some questions about the planning unit data.
 
 The vegetation data describe the spatial distribution of `r n_features` vegetation classes in the study area. This data is in a raster format and so the data are organized using a grid comprising square grid cells that are each the same size. In our case, the raster data contains multiple layers (also called "bands") and each layer has corresponds to a spatial grid with exactly the same area and has exactly the same dimensionality (i.e. number of rows, columns, and cells). In this dataset, there are `r n_features` different regular spatial grids layered on top of each other -- with each layer corresponding to a different vegetation class -- and each of these layers contains a grid with `r raster::nrow(veg_data)` rows, `r raster::ncol(veg_data)` columns, and `r nrow(veg_data) * ncol(veg_data)` cells. Within each layer, each cell corresponds to a `r raster::xres(veg_data)/1000` by `r raster::yres(veg_data)/1000` km square. The values associated with each grid cell indicate the (one) presence or (zero) absence of a given vegetation class in the cell.
 
-![](img/lab3_prioritizr/rasterbands.png)
 
 Let's explore the vegetation data.
 
@@ -259,33 +261,28 @@ cellStats(veg_data[[1]], "mean")
 Now, you can try and answer some questions about the vegetation data.
 
 ```{block2, type="rmdquestion"}
-1. What part of the study area is the 13th vegetation class found in (hint: make a map)? For instance, is it in the south-eastern part of the study area?
-2. What proportion of cells contain the 12th vegetation class?
-3. Which vegetation class is the most abundant (i.e. present in the greatest number of cells)?
-
+4. What part of the study area is the 13th vegetation class found in (hint: make a map)? For instance, is it in the south-eastern part of the study area?
+5. What proportion of cells contain the 12th vegetation class?
+6. Which vegetation class is the most abundant (i.e. present in the greatest number of cells)?
 ```
+
 **Answers**
-1. The 13th vegetation class seems to be found in the eastern part of the study area, particularly in the norteast. 
-2. 0.015 
-3. From looking at the sum of all the cells for each layer, vegetation class 2 is the most abundant, present in 819 cells. 
+
+4. The 13th vegetation class seems to be found in the eastern part of the study area, particularly in the norteast. 
+
+5. 0.015 
+
+6. From looking at the sum of all the cells for each layer, vegetation class 12 is the most abundant, present in 819 cells. 
 
 ```{r}
 plot(veg_data[[13]])
-```
 
-```{r}
 # calculate the sum of all the cell values in the 12th layer then divide by total cells 
 cellStats(veg_data[[12]], "sum") / 53464
-```
-```{r}
+
 cellStats(veg_data, "sum")
 ```
 
-
-
-```{r, include = FALSE}
-sum_veg_data <- sum(veg_data)
-```
 
 # Gap analysis
 
@@ -356,16 +353,19 @@ abundance_data$feature[which.max(abundance_data$absolute_abundance_km2)]
 Now, try to answer the following questions.
 
 ```{block2, type="rmdquestion"}
-1. What is the median abundance of the features (hint: `median`)?
-2. What is the name of the feature with smallest abundance?
-3. How many features have a total abundance greater than 100 km^2 (hint: use `sum(abundance_data$absolute_abundance_km2 > set_units(threshold, km^2)` with the correct `threshold` value)?
+7. What is the median abundance of the features (hint: `median`)?
+8. What is the name of the feature with smallest abundance?
+9. How many features have a total abundance greater than 100 km^2 (hint: use `sum(abundance_data$absolute_abundance_km2 > set_units(threshold, km^2)` with the correct `threshold` value)?
 
 ```
 
 **Answers**
-1. 19.1165 km^2
-2. vegetation.3
-3. 6 features have a total abundance greater than 100 km^2.
+
+7. 19.1165 km^2
+
+8. vegetation.3
+
+9. 6 features have a total abundance greater than 100 km^2.
 
 ```{r}
 median(abundance_data$absolute_abundance_km2)
@@ -411,25 +411,29 @@ print(repr_data)
 Now let's investigate how well the species are represented.
 
 ```{block2, type="rmdquestion"}
-1. What is the average proportion of the features held in protected areas (hint: use `mean(table$relative_held)` with the correct `table` name)?
-2. If we set a target of 10% coverage by protected areas, how many features fail to meet this target (hint: use `sum(table$relative_held >= target_value)`  with the correct `table` name)?
-3. If we set a target of 20% coverage by protected areas, how many features fail to meet this target?
-4. Is there a relationship between the total abundance of a feature and how well it is represented by protected areas (hint: `plot(abundance_data$absolute_abundance ~ repr_data$relative_held)`)?
+10. What is the average proportion of the features held in protected areas (hint: use `mean(table$relative_held)` with the correct `table` name)?
+11. If we set a target of 10% coverage by protected areas, how many features fail to meet this target (hint: use `sum(table$relative_held <= target_value)`  with the correct `table` name)?
+12. If we set a target of 20% coverage by protected areas, how many features fail to meet this target?
+13. Is there a relationship between the total abundance of a feature and how well it is represented by protected areas (hint: `plot(abundance_data$absolute_abundance ~ repr_data$relative_held)`)?
 
 ```
 
 **Answers** 
-1. 0.24
-2. 17
-3. 18 
-4. Based on the plot between total abundance and relative_held, a relationship is hard to determine. There are two instances where values of less than 0.4 relative_held corresponds to really high values of total abundance. Overall there does not seem to be a clear relationship at all. 
+
+10. 0.24
+
+11. 17
+
+12. 18 
+
+13. Based on the plot between total abundance and relative_held, a relationship is hard to determine. There are two instances where values of less than 0.4 relative_held correspond to really high values of total abundance. But, overall there does not seem to be a clear relationship at all. 
 
 ```{r}
 mean(repr_data$relative_held)
 
-sum(repr_data$relative_held <= .1)
+sum(repr_data$relative_held < .1)
 
-sum(repr_data$relative_held <= .2)
+sum(repr_data$relative_held < .2)
 
 plot(abundance_data$absolute_abundance ~ repr_data$relative_held)
 ```
@@ -487,16 +491,19 @@ spplot(s1, "solution_1", col.regions = c("grey80", "darkgreen"), main = "s1",
 Now let's examine the solution.
 
 ```{block2, type="rmdquestion"}
-1. How many planing units were selected in the prioritization? What proportion of planning units were selected in the prioritization?
-2. Is there a pattern in the spatial distribution of the priority areas?
-3. Can you verify that all of the targets were met in the prioritization (hint: `eval_feature_representation_summary(p1, s1[, "solution_1"])`)?
+14. How many planning units were selected in the prioritization? What proportion of planning units were selected in the prioritization?
+15. Is there a pattern in the spatial distribution of the priority areas?
+16. Can you verify that all of the targets were met in the prioritization (hint: `eval_feature_representation_summary(p1, s1[, "solution_1"])`)?
 
 ```
 
 **Answers**
-1. 15
-2. There does not seem to be an obvious pattern of the priority areas. There is only one in the south area of the plot, and overall the other priority areas are pretty scattered. 
-3. ?
+
+14. 15
+
+15. There does not seem to be an obvious pattern of the priority areas. There is only one in the south area of the plot, and overall the other priority areas are pretty scattered. 
+
+16. See code chunk below: 
 
 ```{r}
 eval_feature_representation_summary(p1, s1[, "solution_1"])
@@ -616,20 +623,37 @@ assert_that(
 Now, let's compare the solutions.
 
 ```{block2, type="rmdquestion"}
-1. What is the cost of the planning units selected in `s2`, `s3`, and `s4`?
-2. How many planning units are in `s2`, `s3`, and `s4`?
-3. Do the solutions with more planning units have a greater cost? Why (or why not)?
-4. Why does the first solution (`s1`) cost less than the second solution with protected areas locked into the solution (`s2`)?
-5. Why does the third solution (`s3`) cost less than the fourth solution solution with highly degraded areas locked out (`s4`)?
+17. What is the cost of the planning units selected in `s2`, `s3`, and `s4`?
+18. How many planning units are in `s2`, `s3`, and `s4`?
+19. Do the solutions with more planning units have a greater cost? Why (or why not)?
+20. Why does the first solution (`s1`) cost less than the second solution with protected areas locked into the solution (`s2`)?
+21. Why does the third solution (`s3`) cost less than the fourth solution solution with highly degraded areas locked out (`s4`)?
 
 ```
 
 **Answers**
-1. s2: 6600, s3: 6669.9, s4: 6711.6
-2. s2: , s3: , s4: 
-3.
-4.
-5.
+
+17. s2: 6600, s3: 6669.9, s4: 6711.6
+
+18. s2: 205, s3: 211, s4: 212 
+
+19. Yes solutions with greater planning units have a greater cost because the more planning units needed for a reserve, the higher the costs will be associated with them. Also, it could be the case that certain planning units have higher costs associated with them so when more are included in a solution, or when more constraints are added, this will in turn cause the total cost of a solution to go up. 
+
+20. s1 costs way less than s4 because there are way less planning units (15 compared to 205), even though s2 includes planning units that are already covered by protected areas. 
+
+21. s3 costs a little less than s4 because it has one less planning unit than s4 which already excluded degraded areas.  
+
+```{r}
+# calculate number and cost of planning units selected in the prioritization
+eval_n_summary(p2, s2[, "solution_1"])
+eval_cost_summary(p2, s2[, "solution_1"])
+
+eval_n_summary(p3, s3[, "solution_1"])
+eval_cost_summary(p3, s3[, "solution_1"])
+
+eval_n_summary(p4, s4[, "solution_1"])
+eval_cost_summary(p4, s4[, "solution_1"])
+```
 
 
 ## Penalizing fragmentation
@@ -682,13 +706,94 @@ assert_that(
 Now let's compare the solutions to the problems with (`s5`) and without (`s4`) the boundary length penalties.
 
 ```{block2, type="rmdquestion"}
-1. What is the cost the fourth (`s4`) and fifth (`s5`) solutions? Why does the fifth solution (`s5`) cost more than the fourth (`s4`) solution?
-2. Try setting the penalty value to 0.000000001 (i.e. `1e-9`) instead of 0.001. What is the cost of the solution now? Is it different from the fourth solution (`s4`) (hint: try plotting the solutions to visualize them)? Is this is a useful penalty value? Why (or why not)?
-3. Try setting the penalty value to 0.5. What is the cost of the solution now? Is it different from the fourth solution (`s4`) (hint: try plotting the solutions to visualize them)? Is this a useful penalty value? Why (or why not)?
+22. What is the cost the fourth (`s4`) and fifth (`s5`) solutions? Why does the fifth solution (`s5`) cost more than the fourth (`s4`) solution?
+23. Try setting the penalty value to 0.000000001 (i.e. `1e-9`) instead of 0.001. What is the cost of the solution now? Is it different from the fourth solution (`s4`) (hint: try plotting the solutions to visualize them)? Is this is a useful penalty value? Why (or why not)?
+24. Try setting the penalty value to 0.5. What is the cost of the solution now? Is it different from the fourth solution (`s4`) (hint: try plotting the solutions to visualize them)? Is this a useful penalty value? Why (or why not)?
 
 ```
 
 **Answers**
-1. $6711.58 and $8017.98. The 5th solution costs more because it covers more area so as to promote connectivity. 
-2. 
-3. 
+
+22. The costs of s4 and s5 are 6711.6 and 6747.6, respectively. The 5th solution costs more because it covers more area so as to promote connectivity. s5 has 215 planning units, which is 3 more than s4. 
+
+23. The cost of the solution after altering the penalty value to be 0.000000001 is 6480.6, which is less expensive than the 4th solution (s4). This solution also has less planning units, with only 198, which helps explain why it is less expensive. This is probably not a very useful penalty value because it might be leaving out planning units that are actually appropriate to include, shown by how it doesn't even include all of the units from p4.
+
+24. When setting the penalty value at 0.5, the cost increases dramatically to 9426.2 and the number of planning units is 302, which is 90 more than the 4th solution. Consequently, it is so much more expensive than the 4th solution, which was only 6711.6 million Australian dollars. This is not a useful penalty value because it is including many extra planning units that are not actually needed. Looking at the plot, we can visually see that so much of the total land is selected as a conservation planning unit in this solution, which is not helpful. This solution was cause too much money to spent on areas that should not actually be conserved. 
+
+```{r}
+eval_n_summary(p5, s5[, "solution_1"])
+eval_cost_summary(p5, s5[, "solution_1"])
+```
+
+```{r, out.width = "65%"}
+# make new prioritization problem with new penalty value of 0.000000001
+p6_rds <- file.path(dir_data, "p6.rds")
+if (!file.exists(p6_rds)){
+  p6 <- problem(pu_data, veg_data, cost_column = "cost") %>%
+    add_min_set_objective() %>%
+    add_boundary_penalties(penalty = 0.000000001) %>%
+    add_relative_targets(0.1) %>%
+    add_locked_in_constraints("locked_in") %>%
+    add_locked_out_constraints("locked_out") %>%
+    add_binary_decisions() %>%
+    add_lpsymphony_solver()
+  saveRDS(p6, p6_rds)
+}
+p6 <- readRDS(p6_rds)
+
+# print problem
+print(p6)
+
+# solve problem,
+# note this will take a bit longer than the previous runs
+s6 <- solve(p6)
+
+# print solution
+print(s5)
+
+# plot solution
+# selected = green, not selected = grey
+spplot(s6, "solution_1", col.regions = c("grey80", "darkgreen"), main = "s6",
+       colorkey = FALSE)
+
+# cost of new solution 
+eval_cost_summary(p6, s6[, "solution_1"])
+eval_n_summary(p6, s6[, "solution_1"])
+```
+
+
+```{r, out.width = "65%"}
+# make new prioritization problem with new penalty value of 0.05
+p7_rds <- file.path(dir_data, "p7.rds")
+if (!file.exists(p7_rds)){
+  p7 <- problem(pu_data, veg_data, cost_column = "cost") %>%
+    add_min_set_objective() %>%
+    add_boundary_penalties(penalty = 0.05) %>%
+    add_relative_targets(0.1) %>%
+    add_locked_in_constraints("locked_in") %>%
+    add_locked_out_constraints("locked_out") %>%
+    add_binary_decisions() %>%
+    add_lpsymphony_solver()
+  saveRDS(p7, p7_rds)
+}
+p7 <- readRDS(p7_rds)
+
+# print problem
+print(p7)
+
+# solve problem,
+# note this will take a bit longer than the previous runs
+s7 <- solve(p7)
+
+# print solution
+print(s7)
+
+# plot solution
+# selected = green, not selected = grey
+spplot(s7, "solution_1", col.regions = c("grey80", "darkgreen"), main = "s7",
+       colorkey = FALSE)
+
+# cost of new solution 
+eval_cost_summary(p7, s7[, "solution_1"])
+eval_n_summary(p7, s7[, "solution_1"])
+```
